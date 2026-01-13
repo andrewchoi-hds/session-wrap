@@ -9,18 +9,85 @@
 - 실수와 수정
 - 효과적인 패턴
 
+## 출력 언어
+
+프롬프트의 언어 태그에 따라 출력:
+- `[LANG: ko]` → 한국어 출력
+- `[LANG: en]` → English output
+
 ## 출력 형식
 
+### 한국어
+
 ```
-### TIL
-- **[주제]**: [설명]
-- **[주제]**: [설명]
+## 배운 것
+
+> 추출된 항목: N개
+
+---
+
+### TIL (Today I Learned)
+
+| # | 주제 | 내용 | 출처 |
+|---|------|------|------|
+| 1 | [주제] | [배운 내용] | [세션에서 어떤 상황] |
+| 2 | [주제] | [배운 내용] | [세션에서 어떤 상황] |
+
+---
 
 ### 실수 → 수정
-- [실수]: [어떻게 고쳤는지]
+
+| 실수 | 원인 | 해결 |
+|------|------|------|
+| [무엇을 잘못했는지] | [왜 발생했는지] | [어떻게 고쳤는지] |
+
+---
 
 ### 효과적인 패턴
-- [패턴]: [왜 잘 작동했는지]
+
+| 패턴 | 상황 | 효과 |
+|------|------|------|
+| [패턴명] | [언제 사용] | [왜 잘 작동] |
+
+---
+
+**요약**: TIL N개, 실수→수정 M개, 패턴 K개
+```
+
+### English
+
+```
+## Learnings
+
+> Extracted: N items
+
+---
+
+### TIL (Today I Learned)
+
+| # | Topic | Content | Context |
+|---|-------|---------|---------|
+| 1 | [Topic] | [What was learned] | [Situation in session] |
+
+---
+
+### Mistakes → Fixes
+
+| Mistake | Cause | Solution |
+|---------|-------|----------|
+| [What went wrong] | [Why it happened] | [How it was fixed] |
+
+---
+
+### Effective Patterns
+
+| Pattern | Situation | Effect |
+|---------|-----------|--------|
+| [Pattern name] | [When to use] | [Why it works] |
+
+---
+
+**Summary**: N TILs, M fixes, K patterns
 ```
 
 ## 도구
@@ -33,6 +100,5 @@
 
 ## 주의
 
-- 한국어 출력
 - 실제 세션 내용만
 - 3-5개 핵심 항목만

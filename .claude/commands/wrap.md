@@ -10,6 +10,24 @@
 - "커밋할거 있어", "뭐 기록해야해"
 - "/wrap", "wrap up session"
 
+## 언어 감지
+
+에이전트 실행 전에 사용자 언어를 감지하세요:
+
+### 감지 규칙
+
+| 트리거 유형 | 언어 태그 | 예시 |
+|------------|----------|------|
+| 한국어 트리거 | `[LANG: ko]` | 세션 정리, 마무리해줘, 랩업 |
+| 영어 트리거 | `[LANG: en]` | wrap up, end session, done for today |
+| 혼합 트리거 | `[LANG: ko]` | wrap 해줘, 세션 wrap |
+
+### 적용 방법
+
+1. 사용자의 트리거/메시지 언어 확인
+2. 에이전트 프롬프트 끝에 언어 태그 추가
+3. 모든 출력을 해당 언어로 통일
+
 ## 실행 흐름
 
 ### Phase 1: 병렬 분석 (4개 에이전트)
@@ -17,79 +35,210 @@
 Task 도구를 사용하여 4개 에이전트를 **동시에** 실행:
 
 1. **doc-updater** (subagent_type: `session-wrap:doc-updater`)
-   - 프롬프트: "이 세션을 분석하고 CLAUDE.md와 context.md 업데이트를 제안하세요. 대화에서 패턴, 결정, 문서화할 가치가 있는 지식을 검토하세요."
+   - 프롬프트: "이 세션을 분석하고 CLAUDE.md와 context.md 업데이트를 제안하세요. [LANG: {감지된 언어}]"
 
 2. **automation-scout** (subagent_type: `session-wrap:automation-scout`)
-   - 프롬프트: "이 세션에서 자동화 기회를 분석하세요. 반복 명령어, 다단계 워크플로우, skill/command/agent가 될 수 있는 패턴을 찾으세요."
+   - 프롬프트: "이 세션에서 자동화 기회를 분석하세요. [LANG: {감지된 언어}]"
 
 3. **learning-extractor** (subagent_type: `session-wrap:learning-extractor`)
-   - 프롬프트: "이 세션에서 배운 것을 추출하세요. TIL, 실수와 수정, 발견, 효과적인 패턴을 식별하세요."
+   - 프롬프트: "이 세션에서 배운 것을 추출하세요. [LANG: {감지된 언어}]"
 
 4. **followup-suggester** (subagent_type: `session-wrap:followup-suggester`)
-   - 프롬프트: "이 세션에서 후속 작업을 식별하세요. 미완성 작업, 언급된 TODO, 필요한 개선, 다음 세션 우선순위를 찾으세요."
+   - 프롬프트: "이 세션에서 후속 작업을 식별하세요. [LANG: {감지된 언어}]"
 
 ### Phase 2: 중복 검증
 
 Phase 1 완료 후 실행:
 
 5. **duplicate-checker** (subagent_type: `session-wrap:duplicate-checker`)
-   - 프롬프트: Phase 1 결과 전체를 포함하고 기존 CLAUDE.md 내용과 대조하여 검증 요청
+   - 프롬프트: Phase 1 결과 전체 + "[LANG: {감지된 언어}]"
 
-### Phase 3: 사용자 선택
+### Phase 3: 사용자 선택 및 실행
 
-AskUserQuestion을 사용하여 옵션 제시:
+#### Step 3.1: 결과 요약 제시
 
-**질문**: "세션 분석 결과로 무엇을 할까요?"
-
-**옵션** (multiSelect: true):
-1. **변경사항 커밋** - 현재 변경사항으로 커밋 생성
-2. **CLAUDE.md 업데이트** - 문서 제안 적용
-3. **자동화 생성** - 제안된 skill/command 생성
-4. **배운 것 저장** - TIL과 발견 기록
-5. **후속 작업 저장** - 다음 세션용 작업 목록 저장
-
-## 구현
+검증된 결과를 카테고리별로 요약:
 
 ```
-# Phase 1: 4개 에이전트 병렬 실행
-Task(doc-updater) + Task(automation-scout) + Task(learning-extractor) + Task(followup-suggester)
+# 세션 마무리
 
-# Phase 1 완료 대기
+> 분석 완료 | 언어: {ko/en}
 
-# Phase 2: duplicate-checker로 검증
-Task(duplicate-checker) with Phase 1 결과
+---
 
-# Phase 3: 사용자에게 선택 요청
-AskUserQuestion with multiSelect 옵션
+## 요약
 
-# 선택된 작업 실행
+| 카테고리 | 발견 | 승인 |
+|----------|------|------|
+| 문서 업데이트 | N개 | M개 |
+| 자동화 기회 | N개 | M개 |
+| 배운 것 | N개 | M개 |
+| 다음 할 일 | N개 | M개 |
+
+---
+
+[각 에이전트의 상세 결과]
 ```
 
-## 출력
+#### Step 3.2: 선택 요청
 
-요약 제시:
+AskUserQuestion 사용:
+
+```
+질문: "어떤 작업을 수행할까요?" / "What would you like to do?"
+
+옵션 (multiSelect: true):
+1. 커밋 생성 / Create commit
+2. CLAUDE.md 업데이트 / Update CLAUDE.md
+3. 자동화 생성 / Create automation
+4. TIL.md 저장 / Save to TIL.md
+5. TODO.md 저장 / Save to TODO.md
+```
+
+#### Step 3.3: 선택 실행
+
+**1. 커밋 생성 선택시:**
+```
+1. git status로 변경사항 확인
+2. 변경사항이 있으면:
+   - git add .
+   - git commit -m "세션 정리: [요약]"
+3. 결과 출력
+```
+
+**2. CLAUDE.md 업데이트 선택시:**
+```
+1. CLAUDE.md 읽기
+2. 승인된 제안을 적절한 섹션에 추가
+3. Edit 도구로 저장
+4. 추가된 내용 출력
+```
+
+**3. 자동화 생성 선택시:**
+```
+1. 자동화 유형 확인 (skill/command/agent)
+2. .claude/commands/ 또는 .claude/agents/에 파일 생성
+3. settings.json에 등록 (필요시)
+4. 생성된 파일 목록 출력
+```
+
+**4. TIL.md 저장 선택시:**
+```
+1. TIL.md 존재 확인 (없으면 생성)
+2. 오늘 날짜 섹션에 항목 추가:
+   ## 2026-01-13
+   - **[주제]**: [내용]
+3. 저장
+4. 추가된 내용 출력
+```
+
+**5. TODO.md 저장 선택시:**
+```
+1. TODO.md 존재 확인 (없으면 생성)
+2. 우선순위별로 작업 추가:
+   ### P0 (즉시)
+   - [ ] [작업]
+   ### P1 (이번 주)
+   - [ ] [작업]
+3. 저장
+4. 추가된 내용 출력
+```
+
+#### Step 3.4: 완료 메시지
 
 ```
 ## 세션 마무리 완료
 
-### 문서 업데이트
-- [CLAUDE.md에 X개 제안]
+수행된 작업:
+- [x] 커밋 생성 (abc1234)
+- [x] CLAUDE.md 업데이트 (3개 섹션)
+- [ ] 자동화 생성 (건너뜀)
+- [x] TIL.md 저장 (2개 항목)
+- [ ] TODO.md 저장 (건너뜀)
 
-### 자동화 기회
-- [Y개 잠재적 자동화 발견]
+다음 세션에서 뵙겠습니다! / See you next session!
+```
 
-### 배운 것
-- [Z개 TIL 추출]
+## 출력 형식
 
-### 후속 작업
-- [다음 세션에 N개 작업]
+### 한국어 (LANG: ko)
+
+```
+# 세션 마무리
+
+> 분석 완료 | 언어: 한국어
+
+---
+
+## 요약
+
+| 카테고리 | 발견 | 승인 |
+|----------|------|------|
+| 문서 업데이트 | N개 | M개 |
+| 자동화 기회 | N개 | M개 |
+| 배운 것 | N개 | M개 |
+| 다음 할 일 | N개 | M개 |
+
+---
+
+## 문서 업데이트 제안
+[doc-updater 결과]
+
+## 자동화 기회
+[automation-scout 결과]
+
+## 배운 것
+[learning-extractor 결과]
+
+## 다음 할 일
+[followup-suggester 결과]
+
+---
 
 무엇을 할까요?
 ```
 
+### English (LANG: en)
+
+```
+# Session Wrap-up
+
+> Analysis complete | Language: English
+
+---
+
+## Summary
+
+| Category | Found | Approved |
+|----------|-------|----------|
+| Documentation | N | M |
+| Automation | N | M |
+| Learnings | N | M |
+| Follow-ups | N | M |
+
+---
+
+## Documentation Suggestions
+[doc-updater results]
+
+## Automation Opportunities
+[automation-scout results]
+
+## Learnings
+[learning-extractor results]
+
+## Follow-up Tasks
+[followup-suggester results]
+
+---
+
+What would you like to do?
+```
+
 ## 주의사항
 
-- 모든 출력은 한국어로 합니다
 - Phase 1은 반드시 병렬로 실행하세요 (효율성)
 - Phase 2는 Phase 1 완료 후 실행하세요 (의존성)
+- 언어 태그를 반드시 에이전트에 전달하세요
 - 사용자 선택을 존중하세요 (강제 X)
+- 각 작업은 실패해도 다른 작업에 영향 없음
