@@ -1,6 +1,6 @@
 {
   "name": "session-wrap",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Session wrap-up automation for Claude Code / 세션 마무리 자동화",
   "agents": {
     "doc-updater": {
