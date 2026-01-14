@@ -35,14 +35,21 @@ Claude Code 세션 마무리 자동화 플러그인
 
 ## 설치
 
-### 방법 1: zip 파일
+### 방법 1: 원라인 설치 (추천)
+```bash
+curl -sL https://raw.githubusercontent.com/andrewchoi-hds/session-wrap/main/install.sh | bash
+```
+
+업데이트할 때도 같은 명령어를 실행하면 됩니다.
+
+### 방법 2: zip 파일
 ```bash
 # 압축 해제 후 .claude 폴더를 프로젝트로 복사
 unzip session-wrap-plugin.zip
 cp -r .claude /your/project/
 ```
 
-### 방법 2: 직접 복사
+### 방법 3: 직접 복사
 ```bash
 cp -r session-wrap/.claude /your/project/
 ```
