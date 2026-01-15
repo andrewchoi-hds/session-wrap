@@ -12,7 +12,7 @@ Claude Code 플러그인 모음입니다.
 ## 설치
 
 ```bash
-curl -sL https://raw.githubusercontent.com/andrewchoi-hds/session-wrap/main/install.sh | bash
+curl -sL https://raw.githubusercontent.com/andrewchoi-hds/claude-plugins/main/install.sh | bash
 ```
 
 자세한 설치 가이드는 [README.md](README.md) 참조.

@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Claude Plugins 설치 스크립트 (/wrap, /ui)
-# 사용법: curl -sL https://raw.githubusercontent.com/andrewchoi-hds/session-wrap/main/install.sh | bash
+# 사용법: curl -sL https://raw.githubusercontent.com/andrewchoi-hds/claude-plugins/main/install.sh | bash
 
 set -e
 
-REPO="andrewchoi-hds/session-wrap"
+REPO="andrewchoi-hds/claude-plugins"
 BRANCH="main"
 
 echo "📦 Claude Plugins 설치 중..."
@@ -27,7 +27,7 @@ if [ -d ".claude" ]; then
     rm -rf .claude
 fi
 
-cp -r "$TMP_DIR/session-wrap-$BRANCH/.claude" .
+cp -r "$TMP_DIR/claude-plugins-$BRANCH/.claude" .
 
 # 버전 확인
 VERSION=$(grep '"version"' .claude/settings.json | head -1 | sed 's/.*: *"\([^"]*\)".*/\1/')
