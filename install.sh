@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# session-wrap 플러그인 설치 스크립트
+# Claude Plugins 설치 스크립트 (/wrap, /ui)
 # 사용법: curl -sL https://raw.githubusercontent.com/andrewchoi-hds/session-wrap/main/install.sh | bash
 
 set -e
@@ -8,7 +8,7 @@ set -e
 REPO="andrewchoi-hds/session-wrap"
 BRANCH="main"
 
-echo "📦 session-wrap 플러그인 설치 중..."
+echo "📦 Claude Plugins 설치 중..."
 
 # 임시 디렉토리 생성
 TMP_DIR=$(mktemp -d)
@@ -38,5 +38,7 @@ echo ""
 echo "   버전: v$VERSION"
 echo "   위치: $(pwd)/.claude"
 echo ""
-echo "💡 사용법: /wrap 또는 \"세션 정리\" 입력"
+echo "💡 사용법:"
+echo "   /wrap - 세션 마무리 (문서화, 배운 것, 다음 할 일)"
+echo "   /ui   - Fresh UI 디자인 (AI 뻔한 패턴 탈피)"
 echo ""

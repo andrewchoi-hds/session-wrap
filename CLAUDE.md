@@ -9,6 +9,14 @@ Claude Code 플러그인 모음입니다.
 | `/wrap` | 세션 마무리 - 문서화, 자동화 기회, 배운 것, 다음 할 일 정리 |
 | `/ui` | Fresh UI - AI 뻔한 디자인 탈피, 개성있는 UI 생성 |
 
+## 설치
+
+```bash
+curl -sL https://raw.githubusercontent.com/andrewchoi-hds/session-wrap/main/install.sh | bash
+```
+
+자세한 설치 가이드는 [README.md](README.md) 참조.
+
 ## 플러그인 구조
 
 ```

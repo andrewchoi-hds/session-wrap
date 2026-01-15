@@ -1,6 +1,6 @@
-# TODO - Session-Wrap Plugin
+# TODO - Claude Plugins
 
-> 마지막 업데이트: 2026-01-13
+> 마지막 업데이트: 2026-01-15
 
 ---
 
@@ -14,15 +14,15 @@
 
 - [ ] **TODO.md 저장 기능 검증** - /wrap의 Phase 3에서 "TODO.md 저장" 선택시 실제 동작 확인
 - [ ] **Phase 3 사용자 선택 검증** - multiSelect 기능 및 5개 옵션 전체 테스트
-- [ ] **git status 정리** - session-wrap-plugin.zip 변경사항 처리
 
 ---
 
 ## P3 (낮음)
 
 - [ ] **일본어/중국어 지원** - 트리거 및 에이전트 출력 템플릿 추가
-- [ ] **성능 최적화** - Phase 1 병렬 실행 시간 측정 및 개선
-- [ ] **출력 포맷 일관성 검증** - 5개 에이전트 스타일 통일 확인
+- [ ] **GitHub Actions CI/CD** - 태그 푸시 시 자동 릴리스 및 zip 생성
+- [ ] **/release 커맨드** - 버전 업데이트, CHANGELOG, git tag 자동화
+- [ ] **/check 커맨드** - 플러그인 유효성 검증 (settings.json, 파일 존재 등)
 
 ---
 
